@@ -60,7 +60,7 @@
   height: var(--timeline-event-size);
   border-radius: 50%;
   background: var(--timeline-event-bg);
-  border: 2px solid white;
+  border: 2px solid var(--timeline-bg);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: transform 0.2s, box-shadow 0.2s;
 }

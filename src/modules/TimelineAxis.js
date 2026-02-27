@@ -4,10 +4,39 @@
 define(['./utils/domHelpers', './utils/positionCalculator'], function (dom, posCalc) {
   'use strict';
 
-  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  function formatDate(date) {
-    return MONTHS[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+  /**
+   * Formats a date according to a format token (mirrors date-fns patterns used in React version).
+   * Supported tokens: 'MMM d', 'MMM yyyy', 'yyyy'
+   * @param {Date} date
+   * @param {string} fmt
+   * @returns {string}
+   */
+  function formatDate(date, fmt) {
+    var mon = MONTHS_SHORT[date.getMonth()];
+    if (fmt === 'MMM d') {
+      return mon + ' ' + date.getDate();
+    }
+    if (fmt === 'MMM yyyy') {
+      return mon + ' ' + date.getFullYear();
+    }
+    // 'yyyy'
+    return String(date.getFullYear());
+  }
+
+  /**
+   * Returns tick interval and format string for a given range in days.
+   * Mirrors the React getTickInterval() logic exactly.
+   * @param {number} rangeDays
+   * @returns {{ interval: number, fmt: string }}
+   */
+  function getTickInterval(rangeDays) {
+    if (rangeDays <= 30)  return { interval: 1,   fmt: 'MMM d' };
+    if (rangeDays <= 90)  return { interval: 30,  fmt: 'MMM yyyy' };
+    if (rangeDays <= 180) return { interval: 60,  fmt: 'MMM yyyy' };
+    if (rangeDays <= 365) return { interval: 90,  fmt: 'MMM yyyy' };
+    return                       { interval: 365, fmt: 'yyyy' };
   }
 
   /**
@@ -39,18 +68,20 @@ define(['./utils/domHelpers', './utils/positionCalculator'], function (dom, posC
 
     function renderTicks() {
       clearTicks();
-      var rangeDays = (maxDate.getTime() - minDate.getTime()) / (24 * 60 * 60 * 1000);
-      // Show roughly one tick every 30 days, minimum 2 ticks
-      var step = Math.max(1, Math.round(rangeDays / 10));
+      var MS_PER_DAY = 24 * 60 * 60 * 1000;
+      var rangeDays = Math.round((maxDate.getTime() - minDate.getTime()) / MS_PER_DAY);
+      var tickConfig = getTickInterval(rangeDays);
+      var step = tickConfig.interval;
+      var fmt = tickConfig.fmt;
 
       for (var day = 0; day <= rangeDays; day += step) {
-        var tickDate = new Date(minDate.getTime() + day * 24 * 60 * 60 * 1000);
+        var tickDate = new Date(minDate.getTime() + day * MS_PER_DAY);
         var position = posCalc.calculateEventPosition(tickDate, minDate, scale);
 
         var tick = dom.createElement('div', 'timeline-axis-tick');
         var tickLine = dom.createElement('div', 'tick-line');
         var tickLabel = dom.createElement('span', 'tick-label');
-        tickLabel.textContent = formatDate(tickDate);
+        tickLabel.textContent = formatDate(tickDate, fmt);
 
         tick.appendChild(tickLine);
         tick.appendChild(tickLabel);

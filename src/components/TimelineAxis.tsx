@@ -1,5 +1,5 @@
 import React from 'react';
-import { differenceInDays, format } from 'date-fns';
+import { addDays, differenceInDays, format } from 'date-fns';
 
 type TimelineAxisProps = {
   minDate: Date;
@@ -8,9 +8,11 @@ type TimelineAxisProps = {
   orientation: 'horizontal' | 'vertical';
 };
 
-function getTickInterval(rangeDays: number): { interval: number; fmt: string } {
+export function getTickInterval(rangeDays: number): { interval: number; fmt: string } {
   if (rangeDays <= 30) return { interval: 1, fmt: 'MMM d' };
-  if (rangeDays <= 365) return { interval: 30, fmt: 'MMM yyyy' };
+  if (rangeDays <= 90) return { interval: 30, fmt: 'MMM yyyy' };
+  if (rangeDays <= 180) return { interval: 60, fmt: 'MMM yyyy' };
+  if (rangeDays <= 365) return { interval: 90, fmt: 'MMM yyyy' };
   return { interval: 365, fmt: 'yyyy' };
 }
 
@@ -25,8 +27,7 @@ export default function TimelineAxis({
 
   const ticks: { position: number; label: string }[] = [];
   for (let day = 0; day <= rangeDays; day += interval) {
-    const tickDate = new Date(minDate.getTime());
-    tickDate.setDate(tickDate.getDate() + day);
+    const tickDate = addDays(minDate, day);
     ticks.push({
       position: day * scale,
       label: format(tickDate, fmt),

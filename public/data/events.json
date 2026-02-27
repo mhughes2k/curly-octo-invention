@@ -1,0 +1,11 @@
+{
+  "datum": "2026-02-27",
+  "description": "Project reference date",
+  "events": [
+    { "id": "launch", "label": "Project Launch", "description": "Official project start", "daysOffset": 0, "category": "milestone" },
+    { "id": "beta", "label": "Beta Release", "daysOffset": 60, "category": "release" },
+    { "id": "qa-start", "label": "QA Phase Starts", "daysOffset": 14, "relativeMode": "fromPreviousEvent", "relativeToEventId": "beta", "category": "phase" },
+    { "id": "launch-day", "label": "Public Launch (Monday)", "daysOffset": 30, "relativeMode": "fromPreviousEvent", "relativeToEventId": "qa-start", "productionRule": "closestWeekday:monday", "category": "milestone" },
+    { "id": "holiday-skip", "label": "First Day After Holiday", "daysOffset": 7, "relativeMode": "fromPreviousEvent", "relativeToEventId": "launch-day", "productionRule": "skipHolidays:US", "category": "milestone" }
+  ]
+}
