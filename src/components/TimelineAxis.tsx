@@ -41,7 +41,7 @@ export default function TimelineAxis({
             ? { left: tick.position }
             : { top: tick.position };
         return (
-          <span key={`${tick.position}-${tick.label}`} className="axis-tick" style={style}>
+          <span key={`${tick.position}-${tick.label}`} className="timeline-axis-tick" style={style}>
             {tick.label}
           </span>
         );
