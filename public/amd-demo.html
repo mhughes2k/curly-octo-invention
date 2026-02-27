@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timeline — AMD / Vanilla JS Demo</title>
+    <link rel="stylesheet" href="/src/styles/timeline.css" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 1.5rem;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f9fafb;
+        color: #1f2937;
+      }
+      h1 { margin: 0 0 0.25rem; font-size: 1.75rem; }
+      .subtitle { color: #6b7280; margin: 0 0 1.5rem; font-size: 0.95rem; }
+      .controls { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+      button {
+        padding: 0.45rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #374151;
+      }
+      button:hover { background: #f3f4f6; }
+      button.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+      #timeline-root {
+        height: 320px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      #event-log {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: #6b7280;
+        min-height: 2.5rem;
+      }
+      #event-log span { color: #1f2937; font-weight: 500; }
+      a.back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #3b82f6;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      a.back-link:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <a class="back-link" href="/">← Back to React demo</a>
+    <h1>Timeline — AMD / Vanilla JS</h1>
+    <p class="subtitle">No React, no build step — plain AMD modules loaded by RequireJS.</p>
+
+    <div class="controls">
+      <button id="btn-horizontal" class="active">Horizontal</button>
+      <button id="btn-vertical">Vertical</button>
+      <button id="btn-destroy">Destroy</button>
+      <button id="btn-recreate" style="display:none">Recreate</button>
+    </div>
+
+    <div id="timeline-root"></div>
+    <div id="event-log">Click an event to see details here.</div>
+
+    <!--
+      RequireJS is loaded from a CDN so that this HTML page can be opened
+      directly in a browser (e.g. via `vite preview` or a static file server)
+      without a build step.
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js"
+            integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb"
+            crossorigin="anonymous"></script>
+    <script>
+      require.config({
+        baseUrl: '/src/modules',
+        urlArgs: 'bust=' + Date.now(),
+      });
+
+      var timeline = null;
+      var currentOrientation = 'horizontal';
+
+      function log(msg) {
+        var el = document.getElementById('event-log');
+        el.innerHTML = msg;
+      }
+
+      require(['Timeline'], function (Timeline) {
+        function create(orientation) {
+          var container = document.getElementById('timeline-root');
+          timeline = new Timeline(container, {
+            datum: '2026-02-27',
+            relativeEventsUrl: '/data/events.json',
+            fixedEventsUrl: '/data/fixed-events.json',
+            orientation: orientation,
+            scale: 8,
+            onEventClick: function (event) {
+              var dateStr = event.date instanceof Date
+                ? event.date.toLocaleDateString()
+                : String(event.date);
+              log('Selected: <span>' + event.label + '</span> — ' + dateStr
+                + (event.description ? ' — ' + event.description : ''));
+            },
+          });
+          timeline.render();
+        }
+
+        create(currentOrientation);
+
+        document.getElementById('btn-horizontal').addEventListener('click', function () {
+          currentOrientation = 'horizontal';
+          if (timeline) timeline.update({ orientation: 'horizontal' });
+          document.getElementById('btn-horizontal').classList.add('active');
+          document.getElementById('btn-vertical').classList.remove('active');
+        });
+
+        document.getElementById('btn-vertical').addEventListener('click', function () {
+          currentOrientation = 'vertical';
+          if (timeline) timeline.update({ orientation: 'vertical' });
+          document.getElementById('btn-vertical').classList.add('active');
+          document.getElementById('btn-horizontal').classList.remove('active');
+        });
+
+        document.getElementById('btn-destroy').addEventListener('click', function () {
+          if (timeline) {
+            timeline.destroy();
+            timeline = null;
+            document.getElementById('timeline-root').innerHTML = '';
+            log('Timeline destroyed.');
+          }
+          document.getElementById('btn-destroy').style.display = 'none';
+          document.getElementById('btn-recreate').style.display = '';
+        });
+
+        document.getElementById('btn-recreate').addEventListener('click', function () {
+          create(currentOrientation);
+          log('Timeline recreated.');
+          document.getElementById('btn-recreate').style.display = 'none';
+          document.getElementById('btn-destroy').style.display = '';
+        });
+      });
+    </script>
+  </body>
+</html>

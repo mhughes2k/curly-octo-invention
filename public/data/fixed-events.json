@@ -1,0 +1,7 @@
+{
+  "metadata": "Historical company events",
+  "events": [
+    { "id": "founded", "label": "Company Founded", "date": "2015-03-15", "category": "milestone" },
+    { "id": "series-a", "label": "Series A Funding", "date": "2017-06-01", "category": "milestone" }
+  ]
+}
