@@ -1,0 +1,129 @@
+.timeline-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.timeline-container.horizontal {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-container.vertical {
+  display: flex;
+  flex-direction: row;
+}
+
+.timeline-track {
+  position: relative;
+  overflow: auto;
+  flex: 1;
+}
+
+.timeline-track.horizontal {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 120px;
+}
+
+.timeline-track.vertical {
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 120px;
+}
+
+.timeline-event {
+  position: absolute;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-event:focus {
+  outline: 2px solid #0070f3;
+}
+
+.timeline-event .event-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #0070f3;
+}
+
+.timeline-event .event-label {
+  font-size: 12px;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.timeline-event .event-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.timeline-event:hover .event-tooltip {
+  display: block;
+}
+
+.timeline-connector {
+  position: absolute;
+  background-color: #ccc;
+}
+
+.timeline-connector.horizontal {
+  height: 2px;
+  top: 50%;
+}
+
+.timeline-connector.vertical {
+  width: 2px;
+  left: 50%;
+}
+
+.timeline-axis {
+  position: relative;
+  display: flex;
+}
+
+.timeline-axis.horizontal {
+  flex-direction: row;
+  height: 40px;
+  border-top: 1px solid #ccc;
+}
+
+.timeline-axis.vertical {
+  flex-direction: column;
+  width: 60px;
+  border-left: 1px solid #ccc;
+}
+
+.timeline-axis .axis-tick {
+  position: absolute;
+  font-size: 11px;
+  color: #666;
+}
+
+.timeline-loading,
+.timeline-error,
+.timeline-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 14px;
+  color: #666;
+}
+
+.timeline-error {
+  color: #d32f2f;
+}
